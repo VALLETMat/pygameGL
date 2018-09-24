@@ -1,5 +1,6 @@
 import os
 import pygame
+
 from Cell import *
 from Entity import *
 from Board import *
