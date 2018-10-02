@@ -2,7 +2,6 @@ import os
 import pygame
 import Inventory
 
-
 from Cell import *
 from Entity import *
 from Board import *
@@ -21,7 +20,6 @@ def drawInventory(fenetre,board,player,selected):
         item_name = font.render(it.name(), 1, (255,255,255))
         fenetre.blit(item_name, (55,100 + ind * 30))
         ind += 1
-
     pygame.display.flip()
 
 def inventoryMode(fenetre,board,player):
@@ -111,11 +109,13 @@ def drawBoard(board,player):
     pygame.display.flip()
 
 def play():
-    board = Board(10)
+    game = Game()
+    level = 0
+    board = game.boards[level]
     player = Player(board.cells[2][2])
-
     drawBoard(board,player)
     gameOver = False
+
     while(not gameOver):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -145,6 +145,18 @@ def play():
                     entitiesAct(board.entities,player,board)
                     drawBoard(board,player)
                     drawTEXT(fenetre,cell.inspect())
+                    print(cell.__class__.__name__)
+
+                if posIsCorrect(board,tuplePos[0],tuplePos[1]) and cell.__class__.__name__ == 'StairUp':
+                    board.cells[player.position.x][player.position.y].occupying = None
+                    board = game.boards[level-1]
+                    level -=1
+                    player.position = board.cells[player.position.x][player.position.y]
+                    board.cells[player.position.x][player.position.y].occupying = player
+                    entities = board.entities
+                    drawBoard(board,player)
+                if posIsCorrect(board,tuplePos[0],tuplePos[1]) and cell.__class__.__name__ == 'StairDown':
+                    drawBoard(board,player)
             if event.type == pygame.MOUSEMOTION:
                 if abs(pygame.mouse.get_rel()[0]) +abs(pygame.mouse.get_rel()[1]) ==1:
                     tuplePos = getPos(pygame.mouse.get_pos(),board)
@@ -158,7 +170,6 @@ def play():
                 board.entities.remove(e)
                 board.cells[e.position.x][e.position.y].occupying = None
                 drawBoard(board,player)
-                print(e)
         if(player.HP <= 0 ):
             gameOver = True
     print("Game Over, thanks for playing")

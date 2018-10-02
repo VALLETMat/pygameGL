@@ -56,7 +56,7 @@ class Player(Entity):
 	inventory = Inventory(10)
 	def interract(self,player) :
 		return;
-	def ATKack(self,entity):
+	def attack(self,entity):
 		damage = random.randint(self.ATK-3 - entity.DEF, self.ATK-entity.DEF)
 		entity.HP = min(entity.HP,entity.HP-damage)
 	def inspect(self):
@@ -73,7 +73,7 @@ class Ennemy(Entity):
 	ATK = 5
 	def interract(self,player) :
 		if self.areNeighbours(player):
-			return player.ATKack(self)
+			return player.attack(self)
 	def attack(self,player):
 		damage = random.randint(self.ATK -3 - player.getDEF(), self.ATK - player.getDEF())
 		player.HP = min(player.getHP(),player.getHP()-damage)

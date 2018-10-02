@@ -10,8 +10,8 @@ class Inventory():
 	Armor = None
 	Weapon = None
 	Accessory = None
-
 	def __init__(self,size):
+
 		self.size = size
 
 	def canPick(self):
@@ -136,5 +136,13 @@ class Stick(Weapon):
 	sprite_path = os.path.join(resource_path, 'sword.png') # The image folder path
 	def inspect(self):
 		return "A stick"
+	def name(self):
+		return "Stick"
+
+class PlateArmor(Armor):
+	DEF = 3
+	sprite_path = os.path.join(resource_path, 'armor.png')
+	def inspect(self):
+		return "I hope it fits !"
 	def name(self):
 		return "Stick"
