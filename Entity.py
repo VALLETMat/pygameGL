@@ -1,6 +1,7 @@
 import os
 import pygame
 from Inventory import *
+import random
 
 current_path = os.path.dirname(__file__) # Where your .py file is located
 resource_path = os.path.join(current_path, 'sprite') # The resource folder path
@@ -50,30 +51,35 @@ class Player(Entity):
 	sprite_path = os.path.join(resource_path, 'player.png')
 	HP= 10
 	DEF = 1
-	ATK=1
+	ATK=4
 
 	inventory = Inventory(10)
 	def interract(self,player) :
-		return openInventory()
-	def openInventory(self) :
-		print("loot")
-	def attack(self,entity):
-		print("BIM")
+		return;
+	def ATKack(self,entity):
+		damage = random.randint(self.ATK-3 - entity.DEF, self.ATK-entity.DEF)
+		entity.HP = min(entity.HP,entity.HP-damage)
 	def inspect(self):
 		return "HP : "+str(self.HP)+" DEF : "+ str(self.DEF)
+	def getHP(self):
+		return self.inventory.getHP() + self.HP
+	def getDEF(self):
+		return self.inventory.getDEF() + self.DEF
+	def getATK(self):
+		return self.inventory.getATK() + self.ATK
 class Ennemy(Entity):
 	HP= 10
-	DEF = 1
-	ATT = 1
+	DEF = 0
+	ATK = 5
 	def interract(self,player) :
 		if self.areNeighbours(player):
-			return player.attack(self)
+			return player.ATKack(self)
 	def attack(self,player):
-		print("BAM")
+		damage = random.randint(self.ATK -3 - player.getDEF(), self.ATK - player.getDEF())
+		player.HP = min(player.getHP(),player.getHP()-damage)
 	def inspect(self):
-		return "HP : "+str(self.HP)+" DEF : "+ str(self.DEF)
+		return "HP : "+str(self.HP)+" DEF : "+ str(self.DEF)+" ATK : "+ str(self.ATK)
 	def act(self,player,board):
-		print("act")
 		if self.areNeighbours(player):
 			self.attack(player)
 		self.moveToPlayer(player,board)

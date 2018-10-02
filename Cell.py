@@ -19,6 +19,7 @@ class Cell:
 		return
 	def interract(self,player):
 		return
+
 class Floor (Cell):
 	occupying = None 	#entity on the floor
 	item = None			#item on the floor
@@ -29,7 +30,7 @@ class Floor (Cell):
 		return self.occupying is None
 	def interract(self,player):
 		if self.item is not None and player == self.occupying:
-			return self.item.interract(player)
+			return self.item.interract(self,player)
 		if self.occupying is not None:
 			return self.occupying.interract(player)
 	def inspect(self):
@@ -38,6 +39,7 @@ class Floor (Cell):
 		if self.item is not None:
 			return self.item.inspect()
 		return "Nothing interresting";
+
 class Wall (Cell):
 	occupying = None 	#entity on the floor
 	item = None			#item on the floor

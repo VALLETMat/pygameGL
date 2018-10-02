@@ -7,6 +7,45 @@ from Cell import *
 from Entity import *
 from Board import *
 
+def drawInventory(fenetre,board,player,selected):
+    pygame.draw.rect(fenetre,(1,1,1),[0, 0, 750, 750],0)
+    drawInfo(fenetre,player)
+    pygame.display.flip()
+    font = pygame.font.SysFont("monospace", 15)
+
+    ind = 0
+    for it in player.inventory.items:
+        if(selected == ind):
+            i = font.render(">", 1, (255,255,255))
+            fenetre.blit(i, (40, 100 + ind * 30))
+        item_name = font.render(it.name(), 1, (255,255,255))
+        fenetre.blit(item_name, (55,100 + ind * 30))
+        ind += 1
+
+    pygame.display.flip()
+
+def inventoryMode(fenetre,board,player):
+    selected = 0
+    drawInventory(fenetre,board,player,selected)
+    quit = False
+    while(not quit):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_i:
+                    quit = True
+                if event.key == pygame.K_z:
+                    selected = max(selected-1,0)
+                if event.key == pygame.K_s:
+                    selected = min(selected+1,len(player.inventory.items)-1)
+                    print(str(selected)+" "+str(len(player.inventory.items)))
+                if event.key == pygame.K_SPACE:
+                    player.inventory.equip(player.inventory.items,selected)
+
+                drawInventory(fenetre,board,player,selected)
+    drawBoard(board,player)
+
 def drawTEXT(fenetre, string):
     font = pygame.font.SysFont("monospace", 15)
 
@@ -22,23 +61,23 @@ def drawInfo(fenetre,player):
 
     pygame.draw.rect(fenetre, (1,1,1), [50, 555, 375, 150], 0)
     pygame.draw.rect(fenetre, (251,251,251), [50, 555, 375, 150], 1)
-
     lvl = font.render("LVL : 1" , 1, (255,255,255))
-    hp =  font.render("HP :  "+ str(player.HP) , 1, (255,255,255))
-    ATK = font.render("ATK : "+ str(player.ATK) , 1, (255,255,255))
-    defense = font.render("DEF : "+ str(player.DEF) , 1, (255,255,255))
+
+    hp =  font.render("HP :  "+ str(player.HP+player.inventory.getHP()) , 1, (255,255,255))
+    ATK = font.render("ATK : "+ str(player.ATK+player.inventory.getATK()) , 1, (255,255,255))
+    defense = font.render("DEF : "+ str(player.DEF+player.inventory.getDEF()) , 1, (255,255,255))
     if player.inventory.Armor is None:
         armor  = font.render("Armor : Butt-naked" , 1, (255,255,255))
     else :
-        armor  = font.render("Armor :     "+ player.inventory.Armor.inspect() , 1, (255,255,255))
+        armor  = font.render("Armor :     "+ player.inventory.Armor.name() , 1, (255,255,255))
     if player.inventory.Accessory is None:
         access = font.render("Accessory : None" , 1, (255,255,255))
     else:
-        access = font.render("Accessory : "+ player.inventory.Accessory.inspect() , 1, (255,255,255))
+        access = font.render("Accessory : "+ player.inventory.Accessory.name() , 1, (255,255,255))
     if player.inventory.Weapon is None:
         weapon = font.render("Weapon :    Fist" , 1, (255,255,255))
     else :
-        weapon = font.render("Weapon :    "+ player.inventory.Weapon.inspect() , 1, (255,255,255))
+        weapon = font.render("Weapon :    "+ player.inventory.Weapon.name() , 1, (255,255,255))
 
     fenetre.blit(lvl, (50,555))
     fenetre.blit(hp,  (50,590))
@@ -74,16 +113,16 @@ def drawBoard(board,player):
 def play():
     board = Board(10)
     player = Player(board.cells[2][2])
-    rat = Rat(board.cells[7][7])
 
-    entities = [rat]
     drawBoard(board,player)
-    while(True):
+    gameOver = False
+    while(not gameOver):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return
-
             if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_i:
+                    inventoryMode(fenetre,board,player)
                 if event.key == pygame.K_z:
                     player.moveUp(board)
                 if event.key == pygame.K_s:
@@ -92,19 +131,20 @@ def play():
                          player.moveLeft(board)
                 if event.key == pygame.K_d:
                       player.moveRight(board)
-
-                player.applyMove(board)
-                drawBoard(board,player)
-                entitiesAct(entities,player,board)
-                drawBoard(board,player)
+                if event.key == pygame.K_z or event.key == pygame.K_q or event.key == pygame.K_s or event.key == pygame.K_d:
+                    player.applyMove(board)
+                    drawBoard(board,player)
+                    entitiesAct(board.entities,player,board)
+                    drawBoard(board,player)
             if event.type == pygame.MOUSEBUTTONDOWN:
                 tuplePos = getPos(pygame.mouse.get_pos(),board)
-                if posIsCorrect(board,tuplePos[0],tuplePos[1]):
+                if posIsCorrect(board,tuplePos[0],tuplePos[1]) and board.cells[tuplePos[0]][tuplePos[1]].occupying is not None:
                     cell = board.cells[tuplePos[0]][tuplePos[1]]
                     drawBoard(board,player)
                     cell.interract(player)
-                    entitiesAct(entities,player,board)
+                    entitiesAct(board.entities,player,board)
                     drawBoard(board,player)
+                    drawTEXT(fenetre,cell.inspect())
             if event.type == pygame.MOUSEMOTION:
                 if abs(pygame.mouse.get_rel()[0]) +abs(pygame.mouse.get_rel()[1]) ==1:
                     tuplePos = getPos(pygame.mouse.get_pos(),board)
@@ -113,7 +153,15 @@ def play():
                         if cell.occupying is not None or cell.item is not None:
                             drawBoard(board,player)
                             drawTEXT(fenetre,cell.inspect())
-
+        for e in board.entities:
+            if e.HP <= 0:
+                board.entities.remove(e)
+                board.cells[e.position.x][e.position.y].occupying = None
+                drawBoard(board,player)
+                print(e)
+        if(player.HP <= 0 ):
+            gameOver = True
+    print("Game Over, thanks for playing")
 pygame.init()
 fenetre = pygame.display.set_mode((750, 750))
 pygame.key.set_repeat(300,300)

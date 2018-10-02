@@ -15,25 +15,30 @@ class Inventory():
 		self.size = size
 
 	def canPick(self):
-		return self.size > len(items)
+		return self.size > len(self.items)
 
 	def pick(self,item):
 		if(self.canPick()):
 			self.items.append(item)
 
-	def equip(self,item):
+	def equip(self,items,index):
+
+		item = items[index]
 		if(item.type == 'Armor'):
-			if(self.armor is not None):
-				self.unequip(self.armor)
+			items.remove(item)
+			if(self.Armor is not None):
+				items.append(self.Armor)
 			self.Armor = item
-		if(item.type == 'Weapon'):
-			if(self.armor is not None):
-				self.unequip(self.Weapon)
+		elif(item.type == 'Weapon'):
+			items.remove(item)
+			if(self.Weapon is not None):
+				items.append(self.Weapon)
 			self.Weapon = item
-		if(item.type == 'Acessory'):
-			if(self.armor is not None):
-				self.unequip(self.Accessory)
-			self.Accessory = item
+		elif(item.type == 'Acessory'):
+			items.remove(item)
+			if(self.Weapon is not None):
+				items.append(self.Weapon)
+			self.Weapon = item
 
 	def unequip(self,item):
 		if(self.size == len(self.items)):
@@ -47,15 +52,51 @@ class Inventory():
 		if(item.type == 'Acessory'):
 			self.items[len(self.items)] = self.Accessory
 			self.Accessory = None
+	def toss(self,pos,item,board):
+		cell = board.cells[pos[0]][pos[1]]
+		if cell.item is None:
+			return
+		for space in range(self.size):
+			if items[range] == item:
+				items[range] = None
+				cell.item  = item
 
+	def getHP(self):
+		HP = 0
+		if self.Armor is not None:
+			HP += self.Armor.HP
+		if self.Weapon is not None:
+			HP += self.Weapon.HP
+		if self.Accessory is not None:
+			HP += self.Accessory.HP
+		return HP
+	def getDEF(self):
+		DEF = 0
+		if self.Armor is not None:
+			DEF += self.Armor.DEF
+		if self.Weapon is not None:
+			DEF += self.Weapon.DEF
+		if self.Accessory is not None:
+			DEF += self.Accessory.DEF
+		return DEF
+	def getATK(self):
+		ATK = 0
+		if self.Armor is not None:
+			ATK += self.Armor.ATK
+		if self.Weapon is not None:
+			ATK += self.Weapon.ATK
+		if self.Accessory is not None:
+			ATK += self.Accessory.ATK
+		return ATK
 class Item():
 	name = None
 	HP = 0
 	DEF = 0
-	ATT = 0
+	ATK = 0
 	value = 0
 	type = 'Other'
-	def interract(self,player):
+	def interract(self,cell,player):
+		cell.item = None
 		player.inventory.pick(self)
 class Armor(Item):
 	tier = 0
@@ -64,16 +105,36 @@ class Weapon(Item):
 	tier = 0
 	type = 'Weapon'
 class Accessory(Item):
-	tier = 0
 	type ='Accessory'
+	tier = 0
+
+
 class LongSword(Weapon):
+	ATK = 3
 	sprite_path = os.path.join(resource_path, 'sword.png') # The image folder path
 	def inspect(self):
 		return "a LongSword"
+	def name(self):
+		return "LongSword"
+
+class Ring(Armor):
+	DEF = 2
+	sprite_path = os.path.join(resource_path, 'ring.png') # The image folder path
+	def inspect(self):
+		return "A ring"
+	def name(self):
+		return "Ring"
 
 class Rags(Armor):
-	def inspect():
+	sprite_path = os.path.join(resource_path, 'sword.png') # The image folder path
+	def inspect(self):
 		return "Rags"
+	def name(self):
+		return "Rags"
+
 class Stick(Weapon):
-	def inspect():
+	sprite_path = os.path.join(resource_path, 'sword.png') # The image folder path
+	def inspect(self):
 		return "A stick"
+	def name(self):
+		return "Stick"
