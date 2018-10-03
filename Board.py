@@ -58,8 +58,8 @@ class Game():
 		for i in range (b2.boardSize):
 			for j in range (b2.boardSize):
 				if b2.cells[i][j] is None:
+					
 					b2.cells[i][j] = WoodenFloor(i,j,None)
-
 		print(b2.entities)
 
 		b2.cells[5][5].item = PlateArmor()
@@ -81,5 +81,5 @@ class Game():
 			b.cells[9][i] = BrickWall(9,i)
 			b.cells[i][9] = BrickWall(i,9)
 		b.cells[stairUpX][stairUpY] = StairUp(stairUpX,stairUpY,None)
-		b.cells[stairDownX][stairDownY] = StairUp(stairDownX,stairDownY,None)
+		b.cells[stairDownX][stairDownY] = StairDown(stairDownX,stairDownY,None)
 		return b

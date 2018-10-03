@@ -29,12 +29,12 @@ class Inventory():
 			if(self.Armor is not None):
 				items.append(self.Armor)
 			self.Armor = item
-		elif(item.type == 'Weapon'):
-			items.remove(item)
-			if(self.Weapon is not None):
-				items.append(self.Weapon)
-			self.Weapon = item
 		elif(item.type == 'Acessory'):
+			items.remove(item)
+			if(self.Accessory is not None):
+				items.append(self.Accessory)
+			self.Accessory = item
+		elif(item.type == 'Weapon'):
 			items.remove(item)
 			if(self.Weapon is not None):
 				items.append(self.Weapon)
@@ -145,4 +145,4 @@ class PlateArmor(Armor):
 	def inspect(self):
 		return "I hope it fits !"
 	def name(self):
-		return "Stick"
+		return "Armor"

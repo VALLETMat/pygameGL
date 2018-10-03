@@ -138,24 +138,32 @@ def play():
                     drawBoard(board,player)
             if event.type == pygame.MOUSEBUTTONDOWN:
                 tuplePos = getPos(pygame.mouse.get_pos(),board)
-                if posIsCorrect(board,tuplePos[0],tuplePos[1]) and board.cells[tuplePos[0]][tuplePos[1]].occupying is not None:
-                    cell = board.cells[tuplePos[0]][tuplePos[1]]
+
+                if not posIsCorrect(board,tuplePos[0],tuplePos[1]):
+                    return
+                cell = board.cells[tuplePos[0]][tuplePos[1]]
+                if board.cells[tuplePos[0]][tuplePos[1]].occupying is not None:
                     drawBoard(board,player)
                     cell.interract(player)
                     entitiesAct(board.entities,player,board)
                     drawBoard(board,player)
                     drawTEXT(fenetre,cell.inspect())
-                    print(cell.__class__.__name__)
 
-                if posIsCorrect(board,tuplePos[0],tuplePos[1]) and cell.__class__.__name__ == 'StairUp':
+                if cell.__class__.__name__ == 'StairDown':
                     board.cells[player.position.x][player.position.y].occupying = None
-                    board = game.boards[level-1]
                     level -=1
+                    board = game.boards[level]
                     player.position = board.cells[player.position.x][player.position.y]
                     board.cells[player.position.x][player.position.y].occupying = player
                     entities = board.entities
                     drawBoard(board,player)
-                if posIsCorrect(board,tuplePos[0],tuplePos[1]) and cell.__class__.__name__ == 'StairDown':
+                elif posIsCorrect(board,tuplePos[0],tuplePos[1]) and cell.__class__.__name__ == 'StairDown':
+                    board.cells[player.position.x][player.position.y].occupying = None
+                    level +=1
+                    board = game.boards[level]
+                    player.position = board.cells[player.position.x][player.position.y]
+                    board.cells[player.position.x][player.position.y].occupying = player
+                    entities = board.entities
                     drawBoard(board,player)
             if event.type == pygame.MOUSEMOTION:
                 if abs(pygame.mouse.get_rel()[0]) +abs(pygame.mouse.get_rel()[1]) ==1:
