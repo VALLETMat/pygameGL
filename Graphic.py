@@ -175,8 +175,8 @@ def play():
                             drawTEXT(fenetre,cell.inspect())
         for e in board.entities:
             if e.HP <= 0:
-                board.entities.remove(e)
                 board.cells[e.position.x][e.position.y].occupying = None
+                board.entities.remove(e)
                 drawBoard(board,player)
         if(player.HP <= 0 ):
             gameOver = True
